@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SocialPlatforms;
 
 public class Player : MonoBehaviour
 {
@@ -12,20 +13,30 @@ public class Player : MonoBehaviour
     [SerializeField] Rigidbody2D rb;
     bool jumping = false;
     bool touchingGround;
+    //bool facingRight = true;
 
     private Animator animator;
+    private SpriteRenderer spriteRenderer;
+
+    private int coinScore;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
         animator.SetBool("walking", movementX != 0f);
+
+        if (rb.linearVelocityX != 0)
+        {
+            spriteRenderer.flipX = (rb.linearVelocityX < 0);
+        }
     }
 
     void OnMove(InputValue value)
@@ -36,6 +47,12 @@ public class Player : MonoBehaviour
         movementY = v.y;
 
         Debug.Log(v);
+
+        //facingRight = v.x > 0;
+        //if (spriteRenderer.flipX == facingRight)
+        //{
+        //    spriteRenderer.flipX = !facingRight;
+        //}
     }
 
     void FixedUpdate()
@@ -75,11 +92,8 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void AddCoin(int value)
     {
-        if (collision.gameObject.CompareTag("Collectable"))
-        {
-            collision.gameObject.SetActive(false);
-        }
+        coinScore += value;
     }
 }
